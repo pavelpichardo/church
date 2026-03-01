@@ -39,7 +39,7 @@
                 @forelse($events as $event)
                     <tr class="hover:bg-gray-50 transition-colors">
                         <td class="px-4 py-3">
-                            <p class="font-medium text-gray-800">{{ $event->title }}</p>
+                            <a href="{{ route('admin.events.show', $event) }}" class="font-medium text-gray-800 hover:text-indigo-600 hover:underline">{{ $event->title }}</a>
                             @if($event->location)
                                 <p class="text-xs text-gray-400">{{ $event->location }}</p>
                             @endif
@@ -67,6 +67,8 @@
                         </td>
                         <td class="px-4 py-3 text-right">
                             <div class="flex items-center justify-end gap-2">
+                                <a href="{{ route('admin.events.show', $event) }}"
+                                   class="text-gray-600 hover:text-gray-800 text-xs font-medium">Ver</a>
                                 <a href="{{ route('admin.events.attendance', $event) }}"
                                    class="text-indigo-600 hover:text-indigo-800 text-xs font-medium">Asistencia</a>
                                 @can('events.update')

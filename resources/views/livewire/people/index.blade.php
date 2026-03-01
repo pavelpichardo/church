@@ -50,7 +50,9 @@
             <tbody class="divide-y divide-gray-100">
                 @forelse($people as $person)
                     <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="px-4 py-3 font-medium text-gray-800">{{ $person->full_name }}</td>
+                        <td class="px-4 py-3 font-medium text-gray-800">
+                            <a href="{{ route('admin.people.show', $person) }}" class="hover:text-indigo-600 hover:underline">{{ $person->full_name }}</a>
+                        </td>
                         <td class="px-4 py-3 text-gray-500 hidden md:table-cell">{{ $person->email ?? '—' }}</td>
                         <td class="px-4 py-3 text-gray-500 hidden sm:table-cell">{{ $person->phone ?? '—' }}</td>
                         <td class="px-4 py-3">
@@ -68,6 +70,8 @@
                         </td>
                         <td class="px-4 py-3 text-right">
                             <div class="flex items-center justify-end gap-2">
+                                <a href="{{ route('admin.people.show', $person) }}"
+                                   class="text-gray-600 hover:text-gray-800 text-xs font-medium">Ver</a>
                                 @can('people.update')
                                     <button wire:click="openEdit({{ $person->id }})"
                                             class="text-indigo-600 hover:text-indigo-800 text-xs font-medium">Editar</button>

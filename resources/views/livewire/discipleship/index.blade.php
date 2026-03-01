@@ -39,7 +39,7 @@
                 @forelse($discipleships as $d)
                     <tr class="hover:bg-gray-50 transition-colors">
                         <td class="px-4 py-3">
-                            <p class="font-medium text-gray-800">{{ $d->name }}</p>
+                            <a href="{{ route('admin.discipleships.show', $d) }}" class="font-medium text-gray-800 hover:text-indigo-600 hover:underline">{{ $d->name }}</a>
                             @if($d->description)
                                 <p class="text-xs text-gray-400 truncate max-w-xs">{{ $d->description }}</p>
                             @endif
@@ -65,6 +65,8 @@
                         </td>
                         <td class="px-4 py-3 text-right">
                             <div class="flex items-center justify-end gap-2">
+                                <a href="{{ route('admin.discipleships.show', $d) }}"
+                                   class="text-gray-600 hover:text-gray-800 text-xs font-medium">Ver</a>
                                 <a href="{{ route('admin.discipleships.assignments', $d) }}"
                                    class="text-indigo-600 hover:text-indigo-800 text-xs font-medium">Asignaciones</a>
                                 @can('discipleships.update')

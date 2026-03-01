@@ -17,16 +17,20 @@ Route::middleware(['auth', 'active'])->prefix('admin')->name('admin.')->group(fu
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/people', \App\Livewire\People\PeopleIndex::class)->name('people.index');
+    Route::get('/people/{person}', \App\Livewire\People\PersonShow::class)->name('people.show');
 
     Route::get('/membership', \App\Livewire\Membership\MembershipIndex::class)->name('membership.index');
 
     Route::get('/discipleships', \App\Livewire\Discipleship\DiscipleshipIndex::class)->name('discipleships.index');
+    Route::get('/discipleships/{discipleship}', \App\Livewire\Discipleship\DiscipleshipShow::class)->name('discipleships.show');
     Route::get('/discipleships/{discipleship}/assignments', \App\Livewire\Discipleship\AssignmentManager::class)->name('discipleships.assignments');
 
     Route::get('/library', \App\Livewire\Library\MaterialsIndex::class)->name('library.index');
+    Route::get('/library/{studyMaterial}', \App\Livewire\Library\MaterialShow::class)->name('library.show');
     Route::get('/library/{studyMaterial}/loans', \App\Livewire\Library\LoanManager::class)->name('library.loans');
 
     Route::get('/events', \App\Livewire\Events\EventsIndex::class)->name('events.index');
+    Route::get('/events/{event}', \App\Livewire\Events\EventShow::class)->name('events.show');
     Route::get('/events/{event}/attendance', \App\Livewire\Events\AttendanceSheet::class)->name('events.attendance');
 });
 

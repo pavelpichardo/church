@@ -39,7 +39,7 @@
                 @forelse($materials as $m)
                     <tr class="hover:bg-gray-50 transition-colors">
                         <td class="px-4 py-3">
-                            <p class="font-medium text-gray-800">{{ $m->title }}</p>
+                            <a href="{{ route('admin.library.show', $m) }}" class="font-medium text-gray-800 hover:text-indigo-600 hover:underline">{{ $m->title }}</a>
                             @if($m->author)
                                 <p class="text-xs text-gray-400">{{ $m->author }}</p>
                             @endif
@@ -58,6 +58,8 @@
                         <td class="px-4 py-3 text-gray-500 hidden md:table-cell">{{ $m->active_loans_count }}</td>
                         <td class="px-4 py-3 text-right">
                             <div class="flex items-center justify-end gap-2">
+                                <a href="{{ route('admin.library.show', $m) }}"
+                                   class="text-gray-600 hover:text-gray-800 text-xs font-medium">Ver</a>
                                 <a href="{{ route('admin.library.loans', $m) }}"
                                    class="text-indigo-600 hover:text-indigo-800 text-xs font-medium">Préstamos</a>
                                 @can('library.update')
