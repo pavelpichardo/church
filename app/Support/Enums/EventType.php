@@ -5,7 +5,7 @@ namespace App\Support\Enums;
 enum EventType: string
 {
     case Service = 'service';
-    case Class = 'class';
+    case ClassEvent = 'class';
     case Discipleship = 'discipleship';
     case SpecialEvent = 'special_event';
     case Congress = 'congress';
@@ -14,7 +14,7 @@ enum EventType: string
     {
         return match($this) {
             self::Service => 'Culto',
-            self::Class => 'Clase',
+            self::ClassEvent => 'Clase',
             self::Discipleship => 'Discipulado',
             self::SpecialEvent => 'Evento Especial',
             self::Congress => 'Congreso',

@@ -1,0 +1,151 @@
+<div class="space-y-4">
+    <div class="flex items-center justify-between">
+        <div>
+            <h2 class="text-xl font-bold text-gray-800">Biblioteca</h2>
+            <p class="text-sm text-gray-500">Inventario de materiales de estudio</p>
+        </div>
+        @can('library.create')
+            <button wire:click="openCreate"
+                    class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                Nuevo Material
+            </button>
+        @endcan
+    </div>
+
+    <div class="relative max-w-sm">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
+        </svg>
+        <input type="text" wire:model.live.debounce.300ms="search"
+               placeholder="Buscar por título o autor..."
+               class="w-full pl-9 pr-4 py-2 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <table class="w-full text-sm">
+            <thead class="bg-gray-50 border-b border-gray-200">
+                <tr>
+                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Título</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden sm:table-cell">Tipo</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Disponibles</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">Prestados</th>
+                    <th class="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                @forelse($materials as $m)
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-4 py-3">
+                            <p class="font-medium text-gray-800">{{ $m->title }}</p>
+                            @if($m->author)
+                                <p class="text-xs text-gray-400">{{ $m->author }}</p>
+                            @endif
+                        </td>
+                        <td class="px-4 py-3 hidden sm:table-cell">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                                {{ $m->material_type?->label() ?? '—' }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold
+                                {{ $m->available_quantity > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-700' }}">
+                                {{ $m->available_quantity }} / {{ $m->total_quantity }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-gray-500 hidden md:table-cell">{{ $m->active_loans_count }}</td>
+                        <td class="px-4 py-3 text-right">
+                            <div class="flex items-center justify-end gap-2">
+                                <a href="{{ route('admin.library.loans', $m) }}"
+                                   class="text-indigo-600 hover:text-indigo-800 text-xs font-medium">Préstamos</a>
+                                @can('library.update')
+                                    <button wire:click="openEdit({{ $m->id }})"
+                                            class="text-gray-600 hover:text-gray-800 text-xs font-medium">Editar</button>
+                                @endcan
+                                @can('library.delete')
+                                    <button wire:click="delete({{ $m->id }})"
+                                            wire:confirm="¿Eliminar '{{ $m->title }}'?"
+                                            class="text-red-500 hover:text-red-700 text-xs font-medium">Eliminar</button>
+                                @endcan
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="5" class="px-4 py-10 text-center text-gray-400 text-sm">No hay materiales registrados.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+
+        @if($materials->hasPages())
+            <div class="px-4 py-3 border-t border-gray-200">{{ $materials->links() }}</div>
+        @endif
+    </div>
+
+    {{-- Create/Edit Modal --}}
+    @if($showModal)
+        <div class="fixed inset-0 bg-black/40 z-40" wire:click="$set('showModal', false)"></div>
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg">
+                <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+                    <h3 class="font-semibold text-gray-800">{{ $editingId ? 'Editar' : 'Nuevo' }} Material</h3>
+                    <button wire:click="$set('showModal', false)" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+                <form wire:submit="save" class="px-6 py-5 space-y-4">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Título *</label>
+                        <input type="text" wire:model="title"
+                               class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 @error('title') border-red-400 @enderror">
+                        @error('title') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Autor</label>
+                            <input type="text" wire:model="author"
+                                   class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Tipo *</label>
+                            <select wire:model="material_type"
+                                    class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 @error('material_type') border-red-400 @enderror">
+                                <option value="">Seleccionar...</option>
+                                @foreach($types as $t)
+                                    <option value="{{ $t->value }}">{{ $t->label() }}</option>
+                                @endforeach
+                            </select>
+                            @error('material_type') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Cantidad Total *</label>
+                        <input type="number" wire:model="total_quantity" min="1"
+                               class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 @error('total_quantity') border-red-400 @enderror">
+                        @error('total_quantity') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Descripción</label>
+                        <textarea wire:model="description" rows="2"
+                                  class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                    </div>
+                    <div class="flex justify-end gap-3 pt-2">
+                        <button type="button" wire:click="$set('showModal', false)"
+                                class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                            Cancelar
+                        </button>
+                        <button type="submit"
+                                class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700">
+                            {{ $editingId ? 'Actualizar' : 'Crear' }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    @endif
+</div>

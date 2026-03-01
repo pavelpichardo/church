@@ -9,6 +9,8 @@ class MembershipStageHistory extends Model
 {
     use HasFactory;
 
+    protected $table = 'membership_stage_history';
+
     protected $fillable = [
         'person_id',
         'from_stage_id',

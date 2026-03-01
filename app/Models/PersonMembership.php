@@ -9,6 +9,8 @@ class PersonMembership extends Model
 {
     use HasFactory;
 
+    protected $table = 'person_membership';
+
     protected $fillable = [
         'person_id',
         'current_stage_id',
