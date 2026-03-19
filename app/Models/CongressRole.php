@@ -24,4 +24,9 @@ class CongressRole extends Model
     {
         return $this->hasMany(CongressAssignment::class);
     }
+
+    public function tasks(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(CongressRoleTask::class)->orderBy('phase')->orderBy('sort_order');
+    }
 }

@@ -18,8 +18,8 @@ class RolePermissionSeeder extends Seeder
             // Membership
             'membership.view', 'membership.advance', 'membership.approve',
             // Discipleship
-            'discipleship.view', 'discipleship.create', 'discipleship.update', 'discipleship.delete',
-            'discipleship.assign',
+            'discipleships.view', 'discipleships.create', 'discipleships.update', 'discipleships.delete',
+            'discipleships.assign', 'discipleships.complete',
             // Library
             'library.view', 'library.create', 'library.update', 'library.delete',
             'library.loan', 'library.return',
@@ -53,7 +53,7 @@ class RolePermissionSeeder extends Seeder
         $leader->syncPermissions([
             'people.view', 'people.create', 'people.update',
             'membership.view',
-            'discipleship.view', 'discipleship.assign',
+            'discipleships.view', 'discipleships.assign',
             'library.view', 'library.loan', 'library.return',
             'attendance.view', 'attendance.record',
             'events.view',
@@ -64,7 +64,7 @@ class RolePermissionSeeder extends Seeder
         $secretary->syncPermissions([
             'people.view', 'people.create', 'people.update',
             'membership.view', 'membership.advance',
-            'discipleship.view',
+            'discipleships.view',
             'library.view', 'library.loan', 'library.return',
             'attendance.view', 'attendance.record',
             'events.view', 'events.create', 'events.update',

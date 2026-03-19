@@ -41,4 +41,9 @@ class CongressAssignment extends Model
     {
         return $this->belongsTo(User::class, 'assigned_by');
     }
+
+    public function taskCompletions(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(CongressTaskCompletion::class);
+    }
 }

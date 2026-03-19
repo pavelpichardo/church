@@ -32,6 +32,18 @@ Route::middleware(['auth', 'active'])->prefix('admin')->name('admin.')->group(fu
     Route::get('/events', \App\Livewire\Events\EventsIndex::class)->name('events.index');
     Route::get('/events/{event}', \App\Livewire\Events\EventShow::class)->name('events.show');
     Route::get('/events/{event}/attendance', \App\Livewire\Events\AttendanceSheet::class)->name('events.attendance');
+    Route::get('/events/{event}/congress', \App\Livewire\Events\CongressManager::class)->name('events.congress');
+
+    Route::get('/baptisms', \App\Livewire\Baptisms\BaptismsIndex::class)->name('baptisms.index');
+    Route::get('/baptisms/{baptism}', \App\Livewire\Baptisms\BaptismShow::class)->name('baptisms.show');
+
+    Route::get('/marriages', \App\Livewire\Marriages\MarriagesIndex::class)->name('marriages.index');
+    Route::get('/marriages/{marriage}', \App\Livewire\Marriages\MarriageShow::class)->name('marriages.show');
+
+    Route::get('/communications', \App\Livewire\Communications\CommunicationsIndex::class)->name('communications.index');
+    Route::get('/communications/{communication}', \App\Livewire\Communications\CommunicationShow::class)->name('communications.show');
+
+    Route::get('/reports', \App\Livewire\Reports\ReportsDashboard::class)->name('reports.index');
 });
 
 // Root redirect

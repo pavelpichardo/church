@@ -8,7 +8,7 @@ class AssignDiscipleshipRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()->can('discipleship.assign');
+        return $this->user()->can('discipleships.assign');
     }
 
     public function rules(): array

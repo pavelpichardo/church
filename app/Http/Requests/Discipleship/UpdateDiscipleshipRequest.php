@@ -10,7 +10,7 @@ class UpdateDiscipleshipRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()->can('discipleship.update');
+        return $this->user()->can('discipleships.update');
     }
 
     public function rules(): array

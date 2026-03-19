@@ -10,7 +10,7 @@ class StoreDiscipleshipRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()->can('discipleship.create');
+        return $this->user()->can('discipleships.create');
     }
 
     public function rules(): array

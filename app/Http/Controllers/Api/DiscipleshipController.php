@@ -21,7 +21,7 @@ class DiscipleshipController extends Controller
 {
     public function index(Request $request): AnonymousResourceCollection
     {
-        $this->authorize('discipleship.view');
+        $this->authorize('discipleships.view');
 
         $discipleships = Discipleship::withCount('assignments')
             ->with('leader')
@@ -41,7 +41,7 @@ class DiscipleshipController extends Controller
 
     public function show(Discipleship $discipleship): DiscipleshipResource
     {
-        $this->authorize('discipleship.view');
+        $this->authorize('discipleships.view');
 
         return new DiscipleshipResource($discipleship->load('leader'));
     }
@@ -55,7 +55,7 @@ class DiscipleshipController extends Controller
 
     public function destroy(Discipleship $discipleship): JsonResponse
     {
-        $this->authorize('discipleship.delete');
+        $this->authorize('discipleships.delete');
 
         $discipleship->delete();
 
@@ -64,7 +64,7 @@ class DiscipleshipController extends Controller
 
     public function assignments(Request $request, Discipleship $discipleship): AnonymousResourceCollection
     {
-        $this->authorize('discipleship.view');
+        $this->authorize('discipleships.view');
 
         $assignments = $discipleship->assignments()
             ->with('person')
@@ -84,7 +84,7 @@ class DiscipleshipController extends Controller
 
     public function completeAssignment(Discipleship $discipleship, DiscipleshipAssignment $assignment, CompleteDiscipleship $action): DiscipleshipAssignmentResource
     {
-        $this->authorize('discipleship.assign');
+        $this->authorize('discipleships.assign');
 
         $assignment = $action->handle($assignment);
 

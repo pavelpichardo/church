@@ -11,8 +11,8 @@ class Congress extends Model
 
     protected $fillable = [
         'event_id',
-        'name',
-        'place',
+        'theme',
+        'speaker',
     ];
 
     public function event(): \Illuminate\Database\Eloquent\Relations\BelongsTo
