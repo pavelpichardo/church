@@ -260,6 +260,80 @@
                 @endif
             </div>
 
+            {{-- Puertas --}}
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-100">
+                    <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wider">Puertas</h3>
+                    <p class="text-xs text-gray-400 mt-0.5">Equipos donde sirve y derivaciones recibidas</p>
+                </div>
+
+                {{-- Actualmente en --}}
+                @if($currentMemberships->isNotEmpty() || $openReferrals->isNotEmpty())
+                    <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
+                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Actualmente</p>
+                        <div class="flex flex-wrap gap-2">
+                            @foreach($currentMemberships as $m)
+                                <a href="{{ route('admin.doors.show', $m->door) }}"
+                                   class="inline-flex items-center gap-1.5 rounded-full pl-1.5 pr-3 py-1 text-xs font-medium border border-gray-200 hover:bg-white transition-colors">
+                                    <span class="inline-block w-2.5 h-2.5 rounded-full" style="background-color: {{ $m->door->color ?? '#6b7280' }}"></span>
+                                    {{ $m->door->name }}
+                                    <span class="text-gray-400">· {{ $m->role?->label() }}</span>
+                                </a>
+                            @endforeach
+                            @foreach($openReferrals as $r)
+                                <a href="{{ route('admin.doors.show', $r->door) }}"
+                                   class="inline-flex items-center gap-1.5 rounded-full pl-1.5 pr-3 py-1 text-xs font-medium border border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100 transition-colors">
+                                    <span class="inline-block w-2.5 h-2.5 rounded-full" style="background-color: {{ $r->door->color ?? '#f59e0b' }}"></span>
+                                    {{ $r->door->name }}
+                                    <span class="text-amber-600">· {{ $r->status?->label() }}</span>
+                                    @if($r->ai_inference_id) <span title="Sugerida por IA">🤖</span> @endif
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+
+                {{-- Línea de tiempo --}}
+                @if($doorTimeline->isNotEmpty())
+                    <div class="px-6 py-4">
+                        <ol class="relative border-l border-gray-200 ml-2">
+                            @foreach($doorTimeline as $item)
+                                <li class="mb-5 ml-5 last:mb-0">
+                                    <span class="absolute -left-[7px] flex items-center justify-center w-3.5 h-3.5 rounded-full ring-4 ring-white"
+                                          style="background-color: {{ $item['door']?->color ?? '#6b7280' }}"></span>
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        @if($item['kind'] === 'membership')
+                                            <span class="text-xs" title="Voluntariado">👥</span>
+                                        @else
+                                            <span class="text-xs" title="Derivación">🎯</span>
+                                        @endif
+                                        <a href="{{ route('admin.doors.show', $item['door']) }}"
+                                           class="text-sm font-medium text-gray-800 hover:text-indigo-600">{{ $item['door']?->name }}</a>
+                                        @if($item['active'])
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">activa</span>
+                                        @elseif(! empty($item['status_label']))
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">{{ $item['status_label'] }}</span>
+                                        @endif
+                                        @if(! empty($item['is_ai']))
+                                            <span class="text-xs" title="Sugerida por IA">🤖</span>
+                                        @endif
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-0.5">{{ $item['label'] }}</p>
+                                    <p class="text-xs text-gray-400 mt-0.5">
+                                        {{ \Illuminate\Support\Carbon::parse($item['date'])->format('d/m/Y') }}
+                                        @if($item['end_date'])
+                                            &rarr; {{ \Illuminate\Support\Carbon::parse($item['end_date'])->format('d/m/Y') }}
+                                        @endif
+                                    </p>
+                                </li>
+                            @endforeach
+                        </ol>
+                    </div>
+                @else
+                    <p class="px-6 py-6 text-sm text-gray-400">Esta persona aún no ha sido derivada ni se ha unido al equipo de ninguna puerta.</p>
+                @endif
+            </div>
+
             {{-- Asistencia Reciente --}}
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-100">
@@ -332,6 +406,88 @@
                 @else
                     <p class="text-sm text-gray-400">Sin préstamos activos.</p>
                 @endif
+            </div>
+
+            {{-- Notas y Seguimiento (CRM) --}}
+            @assets
+                <link rel="stylesheet" href="https://unpkg.com/trix@2/dist/trix.css">
+                <script src="https://unpkg.com/trix@2/dist/trix.umd.min.js"></script>
+            @endassets
+
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-1">Notas y Seguimiento</h3>
+                <p class="text-xs text-gray-400 mb-4">Bitácora pastoral. Cada nota se envía a la IA para evaluar derivaciones.</p>
+
+                @can('people.update')
+                    {{-- Acciones rápidas --}}
+                    @php($colorClasses = [
+                        'rose'  => 'border-rose-200 text-rose-700 hover:bg-rose-50',
+                        'amber' => 'border-amber-200 text-amber-700 hover:bg-amber-50',
+                        'green' => 'border-green-200 text-green-700 hover:bg-green-50',
+                    ])
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        @foreach($quickActions as $key => $action)
+                            <button wire:click="quickAction('{{ $key }}')"
+                                    wire:confirm="¿Registrar '{{ $action['label'] }}' para {{ $person->full_name }}?"
+                                    class="inline-flex items-center gap-1.5 rounded-lg border bg-white px-3 py-1.5 text-xs font-medium transition-colors {{ $colorClasses[$action['color']] ?? 'border-gray-200 text-gray-700 hover:bg-gray-50' }}">
+                                {{ $action['label'] }}
+                            </button>
+                        @endforeach
+                    </div>
+
+                    {{-- Editor WYSIWYG (Trix) --}}
+                    <div wire:ignore
+                         x-data="{ value: @entangle('noteBody') }"
+                         x-init="
+                            const editor = $refs.editor;
+                            editor.addEventListener('trix-change', () => { value = editor.value });
+                            Livewire.on('note-cleared', () => { if (editor.editor) editor.editor.loadHTML('') });
+                         ">
+                        <input id="trix_{{ $person->id }}" type="hidden">
+                        <trix-editor x-ref="editor" input="trix_{{ $person->id }}"
+                                     class="trix-content prose prose-sm max-w-none min-h-[110px] rounded-lg border border-gray-300 focus:outline-none"></trix-editor>
+                    </div>
+                    @error('noteBody') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+
+                    <div class="flex justify-end mt-2">
+                        <button wire:click="addNote" wire:loading.attr="disabled"
+                                class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50">
+                            <span wire:loading.remove wire:target="addNote">Agregar nota</span>
+                            <span wire:loading wire:target="addNote">Guardando…</span>
+                        </button>
+                    </div>
+                @endcan
+
+                {{-- Bitácora (CRM log) --}}
+                <div class="mt-5 border-t border-gray-100 pt-4 space-y-4">
+                    @forelse($notes as $note)
+                        <div class="flex gap-3">
+                            <div class="flex-shrink-0 mt-0.5">
+                                @if($note->type?->value === 'quick_action')
+                                    <span class="flex items-center justify-center w-7 h-7 rounded-full bg-amber-100 text-amber-700 text-xs">⚡</span>
+                                @elseif($note->type?->value === 'system')
+                                    <span class="flex items-center justify-center w-7 h-7 rounded-full bg-gray-100 text-gray-500 text-xs">⚙️</span>
+                                @else
+                                    <span class="flex items-center justify-center w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 text-xs">📝</span>
+                                @endif
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <span class="text-xs font-medium text-gray-700">{{ $note->author?->name ?? 'Sistema' }}</span>
+                                    <span class="text-xs text-gray-400">{{ $note->created_at?->diffForHumans() }}</span>
+                                    @if($note->type?->value === 'quick_action')
+                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-50 text-amber-700">{{ $note->type->label() }}</span>
+                                    @endif
+                                </div>
+                                <div class="prose prose-sm max-w-none text-sm text-gray-700 mt-1">
+                                    {!! $note->body !!}
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <p class="text-sm text-gray-400">Sin notas registradas todavía.</p>
+                    @endforelse
+                </div>
             </div>
 
             {{-- Historial de Préstamos --}}

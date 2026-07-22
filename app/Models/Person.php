@@ -120,6 +120,28 @@ class Person extends Model
         return $this->hasMany(CongressAssignment::class);
     }
 
+    public function cells(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Cell::class, 'cell_members')
+            ->withPivot('joined_at', 'left_at')
+            ->withTimestamps();
+    }
+
+    public function doorReferrals(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(DoorReferral::class);
+    }
+
+    public function doorMemberships(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(DoorMember::class);
+    }
+
+    public function notes(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(PersonNote::class)->latest('created_at');
+    }
+
     public function getFullNameAttribute(): string
     {
         return "{$this->first_name} {$this->last_name}";

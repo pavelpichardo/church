@@ -2,6 +2,7 @@
 
 namespace App\Domain\Membership\Actions;
 
+use App\Events\MembershipStageAdvanced;
 use App\Models\MembershipStage;
 use App\Models\MembershipStageHistory;
 use App\Models\Person;
@@ -23,6 +24,10 @@ class AdvanceMembershipStage
 
         $fromStageId = $membership->current_stage_id !== $toStageId
             ? $membership->current_stage_id
+            : null;
+
+        $fromStageName = $fromStageId
+            ? MembershipStage::find($fromStageId)?->name
             : null;
 
         if ($fromStageId === $toStageId) {
@@ -55,6 +60,12 @@ class AdvanceMembershipStage
         if (isset($statusMap[$toStage->name])) {
             $person->update(['status' => $statusMap[$toStage->name]]);
         }
+
+        event(new MembershipStageAdvanced(
+            person: $person->fresh(),
+            toStageName: $toStage->name,
+            fromStageName: $fromStageName,
+        ));
 
         return $membership->fresh('currentStage');
     }

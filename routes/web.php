@@ -29,6 +29,9 @@ Route::middleware(['auth', 'active'])->prefix('admin')->name('admin.')->group(fu
     Route::get('/library/{studyMaterial}', \App\Livewire\Library\MaterialShow::class)->name('library.show');
     Route::get('/library/{studyMaterial}/loans', \App\Livewire\Library\LoanManager::class)->name('library.loans');
 
+    Route::get('/cells', \App\Livewire\Cells\CellsIndex::class)->name('cells.index');
+    Route::get('/cells/{cell}', \App\Livewire\Cells\CellShow::class)->name('cells.show');
+
     Route::get('/events', \App\Livewire\Events\EventsIndex::class)->name('events.index');
     Route::get('/events/{event}', \App\Livewire\Events\EventShow::class)->name('events.show');
     Route::get('/events/{event}/attendance', \App\Livewire\Events\AttendanceSheet::class)->name('events.attendance');
@@ -44,6 +47,12 @@ Route::middleware(['auth', 'active'])->prefix('admin')->name('admin.')->group(fu
     Route::get('/communications/{communication}', \App\Livewire\Communications\CommunicationShow::class)->name('communications.show');
 
     Route::get('/reports', \App\Livewire\Reports\ReportsDashboard::class)->name('reports.index');
+
+    // Doors (Puertas)
+    Route::get('/doors', \App\Livewire\Doors\DoorsIndex::class)->name('doors.index');
+    Route::get('/doors/referrals/pending', \App\Livewire\Doors\PendingReviewInbox::class)->name('doors.pending-review');
+    Route::get('/doors/ai/log', \App\Livewire\Doors\InferenceLog::class)->name('doors.ai-log');
+    Route::get('/doors/{door}', \App\Livewire\Doors\DoorShow::class)->name('doors.show');
 });
 
 // Root redirect

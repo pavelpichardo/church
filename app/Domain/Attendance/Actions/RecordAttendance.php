@@ -2,6 +2,7 @@
 
 namespace App\Domain\Attendance\Actions;
 
+use App\Events\PersonReturnedAfterAbsence;
 use App\Models\AttendanceRecord;
 use App\Models\Event;
 use App\Models\Person;
@@ -12,7 +13,13 @@ class RecordAttendance
 {
     public function handle(Event $event, Person $person, array $data = []): AttendanceRecord
     {
-        return AttendanceRecord::firstOrCreate(
+        // Capture the most recent prior attendance before recording this one,
+        // so we can detect a return after a long absence.
+        $previous = AttendanceRecord::where('person_id', $person->id)
+            ->latest('checked_in_at')
+            ->first();
+
+        $record = AttendanceRecord::firstOrCreate(
             ['event_id' => $event->id, 'person_id' => $person->id],
             [
                 'checked_in_at' => $data['checked_in_at'] ?? now(),
@@ -21,5 +28,14 @@ class RecordAttendance
                 'notes' => $data['notes'] ?? null,
             ]
         );
+
+        if ($record->wasRecentlyCreated && $previous) {
+            $monthsAbsent = (int) $previous->checked_in_at->diffInMonths($record->checked_in_at);
+            if ($monthsAbsent >= 2) {
+                event(new PersonReturnedAfterAbsence($person, $monthsAbsent));
+            }
+        }
+
+        return $record;
     }
 }

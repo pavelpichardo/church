@@ -35,4 +35,12 @@ return [
         ],
     ],
 
+    'anthropic' => [
+        'api_key' => env('ANTHROPIC_API_KEY'),
+        'default_model' => env('ANTHROPIC_DEFAULT_MODEL', 'claude-haiku-4-5'),
+        'doors_ai_enabled' => env('DOORS_AI_ENABLED', false),
+        'doors_ai_confidence_threshold' => (float) env('DOORS_AI_CONFIDENCE_THRESHOLD', 0.85),
+        'doors_ai_max_tokens' => (int) env('DOORS_AI_MAX_TOKENS', 1500),
+    ],
+
 ];

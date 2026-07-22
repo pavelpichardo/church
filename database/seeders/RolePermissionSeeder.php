@@ -27,6 +27,16 @@ class RolePermissionSeeder extends Seeder
             'attendance.view', 'attendance.record',
             // Events
             'events.view', 'events.create', 'events.update', 'events.delete',
+            // Cells
+            'cells.view', 'cells.create', 'cells.update', 'cells.delete', 'cells.multiply',
+            // Doors
+            'doors.view', 'doors.manage',
+            'door_members.manage',
+            'door_activities.view', 'door_activities.manage',
+            'referrals.view', 'referrals.create', 'referrals.assign', 'referrals.close', 'referrals.review_pending',
+            'door_rules.view', 'door_rules.manage',
+            'door_alerts.view', 'door_alerts.manage',
+            'door_ai_inferences.view',
             // Sacraments
             'sacraments.view', 'sacraments.create',
             // Communication
@@ -57,6 +67,11 @@ class RolePermissionSeeder extends Seeder
             'library.view', 'library.loan', 'library.return',
             'attendance.view', 'attendance.record',
             'events.view',
+            'cells.view', 'cells.create', 'cells.update',
+            'doors.view',
+            'door_activities.view',
+            'referrals.view', 'referrals.create', 'referrals.assign', 'referrals.close', 'referrals.review_pending',
+            'door_alerts.view',
         ]);
 
         // Secretary: people CRUD, attendance, events, library (view/loan)
@@ -68,6 +83,11 @@ class RolePermissionSeeder extends Seeder
             'library.view', 'library.loan', 'library.return',
             'attendance.view', 'attendance.record',
             'events.view', 'events.create', 'events.update',
+            'cells.view',
+            'doors.view',
+            'door_activities.view',
+            'referrals.view', 'referrals.create',
+            'door_alerts.view',
         ]);
     }
 }
